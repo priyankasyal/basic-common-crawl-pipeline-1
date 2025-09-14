@@ -1,8 +1,8 @@
 from dataclasses import dataclass
+from typing import List
 
 @dataclass
 class BatchRequest:
     """Request to process a batch."""
     
-    filename: str
-    crawl: str
+    crawls: List[str]  

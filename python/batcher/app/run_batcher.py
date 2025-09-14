@@ -11,29 +11,32 @@ from core.config import config
 
 
 @click.command()
-@click.option("--filename", required=True, help="Cluster index filename")
-@click.option("--crawl", required=True, help="Crawl version")
-def main(filename, crawl):
-    """Process CommonCrawl index file."""
+@click.option("--crawls", required=True, help="Comma-separated list of crawl versions")
+def main(crawls):
+    """Process CommonCrawl index file with multiple crawls using threading."""
+    
+    # Parse crawls
+    crawl_list = [crawl.strip() for crawl in crawls.split(',')]
     
     # Setup logging
     logging.basicConfig(
-        level=getattr(logging, config.log_level),
+        level=getattr(logging, config.log_level.upper()),
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
     
     logger = logging.getLogger(__name__)
-    logger.info(f"Starting batcher with crawl: {crawl}")
+    logger.info(f"Starting multi-threaded batcher")
+    logger.info(f"Crawls: {crawl_list}")
+    logger.info(f"Threads: {config.max_threads}")
     
     # Start metrics server
-    start_metrics_server(config.prometheus_port)
+    start_http_server(config.prometheus_port)
     logger.info(f"Metrics available at http://localhost:{config.prometheus_port}/metrics")
     
     try:
         # Create request
         request = BatchRequest(
-            filename=filename,
-            crawl=crawl
+            crawls=crawl_list
         )
         
         # Process file
@@ -48,6 +51,7 @@ def main(filename, crawl):
         click.echo(f"Failed batches: {stats.failed_batches}")
         click.echo(f"Success rate: {stats.success_rate:.1f}%")
         click.echo(f"Processing time: {stats.processing_time:.2f}s")
+        click.echo(f"Unique URLs processed: {len(service.seen_urls)}")
         
     except Exception as e:
         logger.error(f"Processing failed: {e}")

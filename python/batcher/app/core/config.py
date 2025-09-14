@@ -15,9 +15,10 @@ class Config:
     cluster_idx_filename: str = os.getenv("CLUSTER_IDX_FILENAME", "cluster.idx")
     
     # Processing settings
-    batch_size: int = int(os.getenv("BATCH_SIZE", "100"))
+    batch_size: int = int(os.getenv("BATCH_SIZE", "50"))
     max_retries: int = int(os.getenv("MAX_RETRIES", "3"))
     retry_delay: int = int(os.getenv("RETRY_DELAY", "1"))
+    max_threads: int = int(os.getenv("MAX_THREADS", "4"))
     
     # Monitoring
     prometheus_port: int = int(os.getenv("PROMETHEUS_PORT", "9000"))

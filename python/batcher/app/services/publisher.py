@@ -3,7 +3,6 @@
 import json
 import logging
 from typing import List
-from prometheus_client import Counter
 
 import sys
 import os
@@ -23,17 +22,9 @@ logger = logging.getLogger(__name__)
 class Publisher:
     """Simple message publisher."""
     
-    def __init__(self, channel: RabbitMQChannel):
+    def __init__(self, channel):
         self.channel = channel
-        self._init_metrics()
-
-
-    def _init_metrics(self):
-        """Initialize Prometheus metrics."""
-        self.publish_success = Counter("batcher_publish_success", "Successful publications")
-        self.publish_failure = Counter("batcher_publish_failure", "Failed publications")
-        self.publish_retry = Counter("batcher_publish_retry", "Retry attempts")
- 
+    
     @retry(max_attempts=config.max_retries, delay=config.retry_delay, exceptions=(Exception,))
     def publish_batch(self, documents: List[Document]) -> bool:
         """Publish a batch of documents."""
@@ -49,12 +40,10 @@ class Publisher:
                 body=message
             )
             
-            self.publish_success.inc()
             logger.info(f"Published batch of {len(documents)} documents")
             return True
             
         except Exception as e:
-            self.publish_failure.inc()
             logger.error(f"Failed to publish batch: {e}")
             raise PublishingError(f"Publishing failed: {e}")
     
