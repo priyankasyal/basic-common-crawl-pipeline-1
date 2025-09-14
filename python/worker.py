@@ -5,9 +5,8 @@ import trafilatura
 from warcio.archiveiterator import WARCIterator
 from prometheus_client import Counter
 
-from commoncrawl import BASE_URL, CCDownloader, Downloader
-from rabbitmq import QUEUE_NAME, rabbitmq_channel
-
+from common.commoncrawl import BASE_URL, CCDownloader, Downloader
+from common.rabbitmq import QUEUE_NAME, rabbitmq_channel
 
 batch_counter = Counter("worker_batches", "Number of consumed batches")
 
