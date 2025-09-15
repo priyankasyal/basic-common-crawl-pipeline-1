@@ -30,7 +30,7 @@ python batcher/app/run_batcher.py --crawls CC-MAIN-2024-30,CC-MAIN-2024-22
 
 
 ```bash
-python worker.py --crawls CC-MAIN-2024-30,CC-MAIN-2024-22
+python worker.py 
 ```
 
 ## Monitoring
