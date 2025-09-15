@@ -1,6 +1,7 @@
-from abc import ABC, abstractmethod
-import os
 import logging
+import os
+from abc import ABC, abstractmethod
+
 import pika
 
 logger = logging.getLogger(__name__)
@@ -29,17 +30,15 @@ class RabbitMQChannel(MessageQueueChannel):
 
 def rabbitmq_channel() -> pika.adapters.blocking_connection.BlockingChannel:
     """Create a RabbitMQ channel with proper queue handling."""
-    
+
     connection_string = os.environ.get("RABBITMQ_CONNECTION_STRING")
     if not connection_string:
         raise ValueError("RABBITMQ_CONNECTION_STRING environment variable is required")
-    
+
     try:
-        connection = pika.BlockingConnection(
-            pika.URLParameters(connection_string)
-        )
+        connection = pika.BlockingConnection(pika.URLParameters(connection_string))
         channel = connection.channel()
-        
+
         # Check if queue exists first, then declare with appropriate parameters
         try:
             # Try to check if queue exists (passive=True)
@@ -49,9 +48,9 @@ def rabbitmq_channel() -> pika.adapters.blocking_connection.BlockingChannel:
             # Queue doesn't exist, create it as durable
             channel.queue_declare(queue=QUEUE_NAME, durable=True)
             logger.info(f"Created durable queue '{QUEUE_NAME}'")
-        
+
         return channel
-        
+
     except Exception as e:
         logger.error(f"Failed to create RabbitMQ channel: {e}")
         raise
